@@ -1,11 +1,13 @@
-const Quotes = require("../main")[0].table;
+const { SlashCommandBuilder } = require("discord.js");
 
-const howManyQuotes = (module.exports = {
-  name: "howmanyquotes",
-  description: "replies with the number of quotes",
-  botAction: (message, args) => {
-    Quotes.count().then((count) => {
-      message.reply(`there are ${count} quotes so far`);
-    });
-  },
-});
+module.exports = {
+	data: new SlashCommandBuilder()
+		.setName("howmanyquotes")
+		.setDescription("replies with the current number of quotes"),
+	async execute(interaction) {
+		const Quotes = require("../main")[0].table;
+		Quotes.count().then(async(count) => {
+			await interaction.reply(`there are ${count} quotes so far`);
+		})
+	},
+};

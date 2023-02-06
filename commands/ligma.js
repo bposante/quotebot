@@ -1,9 +1,12 @@
-module.exports = {
-    name: "ligma",
-    description: "ligma",
-    botAction: (message, args) => {
-      const list = ["ligma balls", "who's steve jobs?"]
-      message.reply(list[Math.floor(Math.random() * list.length)]);
-    },
-  };
+const {SlashCommandBuilder} = require("discord.js");
+
   
+module.exports = {
+  data: new SlashCommandBuilder()
+    .setName("ligma")
+    .setDescription("LIGMA"),
+  async execute(interaction) {
+    const list = ["ligma balls", "who's steve jobs?"]
+    await interaction.reply(list[Math.floor(Math.random() * list.length)]);
+  }
+}

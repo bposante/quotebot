@@ -1,29 +1,42 @@
-const addQuote = (module.exports = {
-  name: "addquote",
-  description: "adds a quote to the blackmail database",
-  usage: "!addquote 'quote to be added' 'person that said quote'",
-  botAction: async (message, args) => {
-    if (args[0] === 'help') {
-      return message.reply(addQuote.usage)
-    }
-    const Quotes = require("../main")[0].table;
-    const quoteName = args.slice(0, args.length - 1).join(" ");
-    const date = new Date().toLocaleDateString();
-    try {
-      const quote = await Quotes.create({
-        quote: quoteName,
-        author: args[args.length - 1],
-        date: date,
-      });
-      console.log("quote added at", date);
-      console.log(quote.quote, "by ->", quote.author);
-      return message.reply(`quote added`);
-    } catch (error) {
-      if (error.name === "SequelizeUniqueConstraintError") {
-        return message.reply("that quote already exists");
-      }
-      console.log("addquote -> ", error);
-      return message.reply("something went wrong. check out the command usage:", quote.usage);
-    }
-  },
-});
+const { SlashCommandBuilder } = require("discord.js");
+
+module.exports = {
+	data: new SlashCommandBuilder()
+		.setName("addquote")
+		.setDescription("adds a quote to the blackmail database")
+		.addStringOption((option) =>
+			option
+				.setName("quote")
+				.setDescription("the quote you want to add")
+				.setRequired(true)
+		)
+		.addStringOption((option) =>
+			option
+				.setName("author")
+				.setDescription("who said the quote")
+				.setRequired(true)
+		),
+	async execute(interaction) {
+		const Quotes = require("../main")[0].table;
+		const date = new Date().toLocaleDateString();
+		const quote = interaction.options.getString("quote");
+		const author = interaction.options.getString("author");
+		try {
+			const row = await Quotes.create({
+				quote: quote,
+				author: author,
+				date: date,
+			});
+			console.log(date);
+			console.log(`${row.id}. ${quote} - ${author}`);
+			await interaction.reply("quote added!");
+		} catch (error) {
+			if (error.name === "SequelizeUniqueConstraintError") {
+				await interaction.reply("that quote already exists");
+			} else {
+				console.log(`add quote -> ${error}`);
+				await interaction.reply("something went wrong :(");
+			}
+		}
+	},
+};

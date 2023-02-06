@@ -1,7 +1,12 @@
+const { SlashCommandBuilder } = require("discord.js");
+
+
 module.exports = {
-  name: "ping",
-  description: "replies with pong",
-  botAction: (message, args) => {
-    message.channel.send("pong");
-  },
+	data: new SlashCommandBuilder()
+		.setName("ping")
+		.setDescription("replies with pong!"),
+	async execute(interaction) {
+		const sent = await interaction.reply({content: "pinging...", fetchReply: true});
+		interaction.editReply(`pong! ms: ${sent.createdTimestamp - interaction.createdTimestamp}`)
+	},
 };
